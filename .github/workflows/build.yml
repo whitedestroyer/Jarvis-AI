@@ -1,0 +1,37 @@
+name: Build Jarvis APK
+
+on:
+  push:
+    branches: [ "principal", "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential git ffmpeg libssl-dev libffi-dev libsqlite3-dev zlib1g-dev python3-dev cython3
+        pip install --upgrade pip
+        pip install buildozer kivy
+
+    - name: Build with Buildozer
+      run: |
+        yes | buildozer -v android debug
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Jarvis-APK
+        path: bin/*.apk
+        
